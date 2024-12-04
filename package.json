@@ -18,6 +18,8 @@
     "neverthrow": "^8.1.1",
     "nuxt": "^3.14.1592",
     "radix-vue": "^1.9.10",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1",
     "vue": "latest",
     "vue-router": "latest"
   },

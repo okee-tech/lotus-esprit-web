@@ -22,4 +22,9 @@ export default defineNuxtConfig({
       collections: ["mdi", "material-symbols", "twemoji"],
     },
   },
+  nitro: {
+    experimental: {
+      websocket: true,
+    },
+  },
 });
