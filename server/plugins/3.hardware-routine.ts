@@ -34,10 +34,12 @@ function onServoUpdate(localState: SharedState<ServoSharedState>) {
 
   const dutyRange = config.pwmDutyRange.max - config.pwmDutyRange.min;
   const angleRange = config.angleRange.max - config.angleRange.min;
-  const duty = dutyRange * (state.angle / angleRange) + config.pwmDutyRange.min;
+  const dutyDuration =
+    dutyRange * (state.angle / angleRange) + config.pwmDutyRange.min;
+  const duty = dutyDuration / (1 / config.pwmFrequency);
 
   console.log(
-    `Setting servo ${config.pin} to ${state.angle}°, ${Math.round(duty * 1e6)}us duty`
+    `Setting servo ${config.pin} to ${state.angle}°, ${Math.round(dutyDuration * 1e6)}us, ${Math.round(duty * 100)}% duty`
   );
   servoPin.setPwm(config.pwmFrequency, duty);
 }
