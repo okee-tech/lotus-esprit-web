@@ -1,22 +1,17 @@
-import type { NitroAppIo } from "./1.socket-io";
+import { SharedState } from "./2.socket-shared-state";
 
 // const gpio = new Gpio();
 // const p2 = gpio.get(2);
 
-async function onPwmUpdate(newValue: number) {
+async function onPwmUpdate(newValue: number[]) {
   console.log("Pwm update FROM SERVER: ", newValue);
 }
 
-async function pwmRoutine(nitroApp: NitroAppIo) {
-  const { io } = nitroApp;
-
-  io.of("/shared-state").on("connection", (socket) => {
-    socket.on("state-change", ({ stateId, state }) => {
-      if (stateId == "pwm") onPwmUpdate(state);
-    });
-  });
+async function pwmRoutine() {
+  const pwmState = SharedState.get<number[]>("pwm", [10]);
+  pwmState.on("update", onPwmUpdate);
 }
 
-export default defineNitroPlugin((nitroApp) => {
-  pwmRoutine(nitroApp as NitroAppIo);
+export default defineNitroPlugin((_nitroApp) => {
+  pwmRoutine();
 });

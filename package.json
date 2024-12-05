@@ -30,6 +30,7 @@
     "@nuxtjs/tailwindcss": "^6.12.2",
     "@okee-tech/eslint-plugin-neverthrow": "^1.0.3",
     "@tailwindcss/typography": "^0.5.15",
-    "daisyui": "^4.12.14"
+    "daisyui": "^4.12.14",
+    "typed-emitter": "^2.1.0"
   }
 }
