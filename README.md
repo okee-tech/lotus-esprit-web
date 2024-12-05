@@ -73,3 +73,13 @@ bun run preview
 ```
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+
+# Docker build:
+
+```
+# Create Builder
+docker buildx create --name mybuilder --driver docker-container --use
+
+# Build
+docker buildx build --platform=linux/amd64,linux/arm64 -t docker.qwe.me/okee-tech/delorean-web:latest --push .
+```
