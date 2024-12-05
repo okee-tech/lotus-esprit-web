@@ -27,7 +27,6 @@ class SharedState<T = unknown> extends (EventEmitter as {
   }
 
   static get<T>(stateId: string, initialValue?: T): SharedState<T> {
-    console.log("1");
     if (!SharedState.states.has(stateId)) {
       const newState = new SharedState(stateId);
       newState.state = initialValue as T;
@@ -55,58 +54,62 @@ class SharedState<T = unknown> extends (EventEmitter as {
   public cleanup() {
     this.clients.delete("server");
   }
-}
 
-function configureSharedStateSocketHandler(socket: Socket) {
-  socket.on("join-room", (stateId: string) => {
-    socket.join(stateId);
+  static registerSocket(socket: Socket) {
+    socket.on("join-room", (stateId: string) => {
+      socket.join(stateId);
 
-    if (!SharedState.states.has(stateId))
-      SharedState.states.set(stateId, new SharedState(stateId));
+      if (!SharedState.states.has(stateId))
+        SharedState.states.set(stateId, new SharedState(stateId));
 
-    const localState = SharedState.states.get(stateId)!;
-    localState.clients.add(socket.id);
-    localState.emit("subscribe", socket);
-  });
-
-  socket.on("request-state", (stateId: string) => {
-    const localState = SharedState.states.get(stateId);
-    if (localState)
-      socket.emit("current-state", localState._state, localState.isInitialized);
-  });
-
-  socket.on("state-change", ({ stateId, state }) => {
-    const localState = SharedState.states.get(stateId);
-    if (!localState) return;
-
-    localState._state = state;
-    localState.isInitialized = true;
-    socket.to(stateId).emit("state-update", state);
-    localState.emit("update", state);
-  });
-
-  socket.on("leave-room", (stateId: string) => {
-    const localState = SharedState.states.get(stateId);
-    if (!localState) return;
-
-    localState.clients.delete(socket.id);
-    if (localState.clients.size === 0) SharedState.states.delete(stateId);
-    socket.leave(stateId);
-  });
-
-  socket.on("disconnect", () => {
-    SharedState.states.forEach((localState, stateId) => {
-      if (localState.clients.has(socket.id))
-        localState.clients.delete(socket.id);
-      if (localState.clients.size === 0) SharedState.states.delete(stateId);
+      const localState = SharedState.states.get(stateId)!;
+      localState.clients.add(socket.id);
+      localState.emit("subscribe", socket);
     });
-  });
+
+    socket.on("request-state", (stateId: string) => {
+      const localState = SharedState.states.get(stateId);
+      if (localState)
+        socket.emit(
+          "current-state",
+          localState._state,
+          localState.isInitialized
+        );
+    });
+
+    socket.on("state-change", ({ stateId, state }) => {
+      const localState = SharedState.states.get(stateId);
+      if (!localState) return;
+
+      localState._state = state;
+      localState.isInitialized = true;
+      socket.to(stateId).emit("state-update", state);
+      localState.emit("update", state);
+    });
+
+    socket.on("leave-room", (stateId: string) => {
+      const localState = SharedState.states.get(stateId);
+      if (!localState) return;
+
+      localState.clients.delete(socket.id);
+      if (localState.clients.size === 0) SharedState.states.delete(stateId);
+      socket.leave(stateId);
+    });
+
+    socket.on("disconnect", () => {
+      SharedState.states.forEach((localState, stateId) => {
+        if (localState.clients.has(socket.id))
+          localState.clients.delete(socket.id);
+        if (localState.clients.size === 0) SharedState.states.delete(stateId);
+      });
+    });
+  }
 }
 
 export default defineNitroPlugin((nitroApp) => {
   const io = (nitroApp as NitroAppIo).io;
 
   SharedState.io = io;
-  io.of("/shared-state").on("connection", configureSharedStateSocketHandler);
+  io.of("/shared-state").on("connection", SharedState.registerSocket);
 });
 export { SharedState };
