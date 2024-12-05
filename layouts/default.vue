@@ -12,7 +12,7 @@
     </header>
 
     <!-- Main content -->
-    <main class="h-full container mx-auto px-4 py-6 overflow-auto">
+    <main class="h-full mx-auto px-2 py-6 overflow-auto">
       <slot />
     </main>
   </div>

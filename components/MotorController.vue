@@ -10,22 +10,19 @@ function onToggleClick() {
 </script>
 
 <template>
-  <div class="flex flex-col">
-    Motor: {{ config.pin }}
-    <template v-if="sharedState.state.value">
-      <button class="btn max-w-40" @click="onToggleClick">
-        <template v-if="!sharedState.state.value?.isEnabled">
-          <span>Start</span>
-          <icon name="mdi:play" size="25" />
-        </template>
-        <template v-else>
-          <span>Stop</span>
-          <icon name="mdi:stop" size="25" />
-        </template>
-      </button>
-    </template>
-    <template v-else>
-      <span class="loading loading-spinner loading-lg" />
-    </template>
-  </div>
+  <template v-if="sharedState.state.value">
+    <button class="btn max-w-40" @click="onToggleClick">
+      <template v-if="!sharedState.state.value?.isEnabled">
+        <span>Start</span>
+        <icon name="mdi:play" size="25" />
+      </template>
+      <template v-else>
+        <span>Stop</span>
+        <icon name="mdi:stop" size="25" />
+      </template>
+    </button>
+  </template>
+  <template v-else>
+    <span class="loading loading-spinner loading-lg" />
+  </template>
 </template>

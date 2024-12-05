@@ -19,13 +19,12 @@ function onServoUpdate(localState: SharedState<ServoSharedState>) {
   const servoPin = servoPins.find(
     (servo) => `servo/${servo.pin}` === localState.stateId
   )!;
-  const servoConfig = hardwareConfig.servos.find(
+  const config = hardwareConfig.servos.find(
     (servo) => `servo/${servo.pin}` === localState.stateId
   );
 
   if (!state) return console.error("State was not initialized");
-  if (!servoPin || !servoConfig)
-    return (state.error = "Servo was not initialized");
+  if (!servoPin || !config) return (state.error = "Servo was not initialized");
 
   if (!state.isEnabled) {
     servoPin.clearPwm();
@@ -33,13 +32,14 @@ function onServoUpdate(localState: SharedState<ServoSharedState>) {
     return;
   }
 
-  const duty =
-    (state.angle / 180) *
-      (servoConfig.pwmDutyRange.max - servoConfig.pwmDutyRange.min) +
-    servoConfig.pwmDutyRange.min;
+  const dutyRange = config.pwmDutyRange.max - config.pwmDutyRange.min;
+  const angleRange = config.angleRange.max - config.angleRange.min;
+  const duty = dutyRange * (state.angle / angleRange) + config.pwmDutyRange.min;
 
-  console.log(`Setting servo ${servoConfig.pin} to ${state.angle}°`);
-  servoPin.setPwm(servoConfig.pwmFrequency, duty);
+  console.log(
+    `Setting servo ${config.pin} to ${state.angle}°, ${Math.round(duty * 1e6)}us duty`
+  );
+  servoPin.setPwm(config.pwmFrequency, duty);
 }
 
 function onMotorUpdate(state: SharedState<MotorSharedState>) {
@@ -54,7 +54,7 @@ function onMotorUpdate(state: SharedState<MotorSharedState>) {
 }
 
 async function hardwareRoutine() {
-  const sharedServos = hardwareConfig.motors.map((motor) => {
+  const sharedServos = hardwareConfig.servos.map((motor) => {
     return SharedState.get<ServoSharedState>(`servo/${motor.pin}`, {
       angle: 0,
       isEnabled: false,

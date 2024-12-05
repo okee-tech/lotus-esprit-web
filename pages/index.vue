@@ -4,19 +4,30 @@ import hardwareConfig from "#utils/hardware-configuration";
 
 <template>
   <div class="flex flex-col">
-    <template
-      v-for="servo in hardwareConfig.servos"
-      :key="servo.pin * Math.random()"
-    >
-      <ServoController :config="servo" />
-    </template>
+    <div class="grid grid-cols-2 text-center">
+      <template v-for="(servo, i) in hardwareConfig.servos" :key="i">
+        <div
+          class="flex flex-col mb-4 w-full border-solid border rounded-xl border-base-300"
+        >
+          <div class="text-xl font-bold">
+            Servo: {{ i + 1 }} ({{
+              servo.angleRange.max == 270 ? "Small" : "Big"
+            }})
+          </div>
+          <div>{{ servo.angleRange }}</div>
+          <ServoController :config="servo" />
+        </div>
+      </template>
+    </div>
     <div class="h-4" />
 
-    <template
-      v-for="motor in hardwareConfig.motors"
-      :key="motor.pin * Math.random()"
-    >
-      <MotorController :config="motor" />
-    </template>
+    <div class="grid grid-cols-2 text-center place-items-center">
+      <template v-for="(motor, i) in hardwareConfig.motors" :key="i">
+        <div class="flex flex-col mb-2">
+          <div class="text-xl font-bold">Motor: {{ i + 1 }}</div>
+          <MotorController :config="motor" />
+        </div>
+      </template>
+    </div>
   </div>
 </template>
