@@ -1,7 +1,14 @@
+type SocketState<T = unknown> = {
+  state: Ref<T | undefined>;
+  isConnected: Ref<boolean>;
+  error: Ref<string | null>;
+  cleanup: () => void;
+};
+
 export const useSocketState = <T = unknown>(
   stateId: string,
   initialState?: T
-) => {
+): SocketState<T> => {
   const socket = useSocket("/shared-state");
   const state = ref<T | undefined>(undefined);
   const isConnected = ref(false);
@@ -70,5 +77,7 @@ export const useSocketState = <T = unknown>(
     cleanup();
   });
 
-  return { state, isConnected, error, cleanup };
+  return { state: state as Ref<T | undefined>, isConnected, error, cleanup };
 };
+
+export type { SocketState };

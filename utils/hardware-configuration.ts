@@ -3,17 +3,17 @@ type Range = {
   max: number;
 };
 
-type ServoConfiguration = {
+type ServoConfig = {
   pin: number;
   angleRange: Range;
   pwmFrequency: number;
   pwmDutyRange: Range; // In Seconds
 };
-type MotorConfiguration = {
+type MotorConfig = {
   pin: number;
 };
 
-const BIG_SERVO: ServoConfiguration = {
+const BIG_SERVO: ServoConfig = {
   pin: -1,
   angleRange: {
     min: 0,
@@ -25,7 +25,7 @@ const BIG_SERVO: ServoConfiguration = {
     max: 2_500e-6,
   },
 };
-const SMALL_SERVO: ServoConfiguration = {
+const SMALL_SERVO: ServoConfig = {
   pin: -1,
   angleRange: {
     min: 0,
@@ -39,8 +39,8 @@ const SMALL_SERVO: ServoConfiguration = {
 };
 
 const hardwareConfig: {
-  servos: ServoConfiguration[];
-  motors: MotorConfiguration[];
+  servos: ServoConfig[];
+  motors: MotorConfig[];
 } = {
   servos: [
     { ...BIG_SERVO, pin: 2 },
@@ -57,3 +57,4 @@ const hardwareConfig: {
 };
 
 export default hardwareConfig;
+export type { ServoConfig, MotorConfig };

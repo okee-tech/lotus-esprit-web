@@ -44,7 +44,7 @@ function onServoUpdate(localState: SharedState<ServoSharedState>) {
 
 function onMotorUpdate(state: SharedState<MotorSharedState>) {
   const motorPin = motorPins.find(
-    (motor) => `pwm/${motor.pin}` === state.stateId
+    (motor) => `motor/${motor.pin}` === state.stateId
   )!;
   if (!state.state) return console.error("State was not initialized");
   if (!motorPin) return console.error("Motor was not initialized");
@@ -54,15 +54,15 @@ function onMotorUpdate(state: SharedState<MotorSharedState>) {
 }
 
 async function hardwareRoutine() {
-  const sharedMotors = hardwareConfig.servos.map((servo) => {
-    return SharedState.get<MotorSharedState>(`servo/${servo.pin}`, {
+  const sharedServos = hardwareConfig.motors.map((motor) => {
+    return SharedState.get<ServoSharedState>(`servo/${motor.pin}`, {
+      angle: 0,
       isEnabled: false,
     });
   });
 
-  const sharedServos = hardwareConfig.motors.map((motor) => {
-    return SharedState.get<ServoSharedState>(`pwm/${motor.pin}`, {
-      angle: 0,
+  const sharedMotors = hardwareConfig.motors.map((servo) => {
+    return SharedState.get<MotorSharedState>(`motor/${servo.pin}`, {
       isEnabled: false,
     });
   });
