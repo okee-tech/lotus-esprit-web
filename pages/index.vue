@@ -4,17 +4,12 @@ import hardwareConfig from "#utils/hardware-configuration";
 
 <template>
   <div class="flex flex-col">
-    <div class="grid grid-cols-2 text-center">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
       <template v-for="(servo, i) in hardwareConfig.servos" :key="i">
         <div
           class="flex flex-col mb-4 w-full border-solid border rounded-xl border-base-300"
         >
-          <div class="text-xl font-bold">
-            Servo: {{ i + 1 }} ({{
-              servo.angleRange.max == 270 ? "Small" : "Big"
-            }})
-          </div>
-          <div>{{ servo.angleRange }}</div>
+          <div class="text-xl font-bold">Servo: {{ i + 1 }}</div>
           <ServoController :config="servo" />
         </div>
       </template>
