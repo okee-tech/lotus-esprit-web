@@ -17,7 +17,7 @@ const BIG_SERVO: ServoConfig = {
   pin: -1,
   angleRange: {
     min: 0,
-    max: 180,
+    max: 270,
   },
   pwmFrequency: 50,
   pwmDutyRange: {
