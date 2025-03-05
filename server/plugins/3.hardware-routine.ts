@@ -111,7 +111,7 @@ async function wingAnimation(state: SharedState<AnimationState>) {
   const rightConf = hardwareConfig.servos.find((el) =>
     state.stateId == "animation-wing-front"
       ? el.name == "Front Left Wing"
-      : el.name == "Read Left Wing"
+      : el.name == "Rear Left Wing"
   );
   const rightPin = SharedState.get<ServoSharedState>(`servo/${rightConf!.pin}`);
   if (!rightPin) {
@@ -123,7 +123,7 @@ async function wingAnimation(state: SharedState<AnimationState>) {
   const leftConf = hardwareConfig.servos.find((el) =>
     state.stateId == "animation-wing-front"
       ? el.name == "Front Right Wing"
-      : el.name == "Read Right Wing"
+      : el.name == "Rear Right Wing"
   );
   const leftPin = SharedState.get<ServoSharedState>(`servo/${leftConf!.pin}`);
   if (!leftPin) {

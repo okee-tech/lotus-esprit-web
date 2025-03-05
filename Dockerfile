@@ -27,11 +27,10 @@ COPY package*.json ./
 RUN npm ci --production
 
 # Copy built application from builder stage
-COPY --from=builder /app/.output ./.output
-COPY --from=builder /app/.nuxt ./.nuxt
+COPY --from=builder /app/.output ./
 
 # Expose the port the app runs on
 EXPOSE 3000
 
 # Command to run the application
-CMD ["node", ".output/server/index.mjs"]
+CMD ["node", "/app/server/index.mjs"]
