@@ -1,6 +1,8 @@
 import hardwareConfig from "#utils/hardware-configuration";
 import { SharedState } from "./2.socket-shared-state";
 import { Gpio, Mode } from "@okee-tech/rppal";
+import { Tween } from "@tweenjs/tween.js";
+import { timer } from "d3-timer";
 
 const gpio = new Gpio();
 const servoPins = hardwareConfig.servos.map((servo) => gpio.get(servo.pin));
@@ -13,6 +15,35 @@ motorPins.forEach((motor) => {
   motor.mode = Mode.Output;
   motor.value = 0;
 });
+
+const INIT_TIME = 5000;
+const INIT_INERVAL = 50;
+const INIT_DUTY = 0.2;
+// async function initialPosition() {
+//   // const sharedServos = hardwareConfig.servos.map((motor) => {
+//   //   return timer()
+//   // });
+
+//   for (const servo of hardwareConfig.servos) {
+//     const servoInitTimer = timer(async (elapres) => {
+//       if (elapres > INIT_TIME) {
+//         servoInitTimer.stop();
+//         return;
+//       }
+
+//       const state = SharedState.get<ServoSharedState>(`servo/${servo.pin}`);
+//       state.state = {
+//         angle: servo.initialAngle,
+//         isEnabled: true,
+//       };
+
+//       await new Promise((resolve) => setTimeout(resolve, INIT_DUTY));
+//       // state.up÷
+//     }, INIT_DELAY);
+//   }
+
+//   sharedServos.forEach((state) => onServoUpdate(state));
+// }
 
 function onServoUpdate(localState: SharedState<ServoSharedState>) {
   const state = localState.state;
@@ -39,7 +70,9 @@ function onServoUpdate(localState: SharedState<ServoSharedState>) {
   const duty = dutyDuration / (1 / config.pwmFrequency);
 
   console.log(
-    `Setting servo ${config.pin} to ${state.angle}°, ${Math.round(dutyDuration * 1e6)}us, ${Math.round(duty * 100)}% duty`
+    `Setting servo ${config.pin} to ${state.angle}°, ${Math.round(
+      dutyDuration * 1e6
+    )}us, ${Math.round(duty * 100)}% duty`
   );
   servoPin.setPwm(config.pwmFrequency, duty);
 }

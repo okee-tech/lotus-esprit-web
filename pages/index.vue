@@ -9,7 +9,7 @@ import hardwareConfig from "#utils/hardware-configuration";
         <div
           class="flex flex-col mb-4 w-full border-solid border rounded-xl border-base-300"
         >
-          <div class="text-xl font-bold">Servo: {{ i + 1 }}</div>
+          <div class="text-xl font-bold">Servo: {{ servo.name }}</div>
           <ServoController :config="servo" />
         </div>
       </template>
@@ -19,7 +19,7 @@ import hardwareConfig from "#utils/hardware-configuration";
     <div class="grid grid-cols-2 text-center place-items-center">
       <template v-for="(motor, i) in hardwareConfig.motors" :key="i">
         <div class="flex flex-col mb-2">
-          <div class="text-xl font-bold">Motor: {{ i + 1 }}</div>
+          <div class="text-xl font-bold">Motor: {{ motor.name }}</div>
           <MotorController :config="motor" />
         </div>
       </template>

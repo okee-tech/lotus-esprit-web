@@ -32,4 +32,9 @@ export default defineNuxtConfig({
       websocket: true,
     },
   },
+  vite: {
+    server: {
+      allowedHosts: ["pi-lotus-esprit.local"],
+    },
+  },
 });

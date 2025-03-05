@@ -5,14 +5,17 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
+    "dev:host": "nuxt dev --host",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
     "@okee-tech/rppal": "^0.1.8",
+    "@tweenjs/tween.js": "^25.0.0",
     "@vueuse/core": "^12.0.0",
     "@vueuse/nuxt": "^12.0.0",
+    "d3-timer": "^3.0.1",
     "eslint": "^9.16.0",
     "luxon": "^3.5.0",
     "neverthrow": "^8.1.1",
@@ -30,6 +33,7 @@
     "@nuxtjs/tailwindcss": "^6.12.2",
     "@okee-tech/eslint-plugin-neverthrow": "^1.0.3",
     "@tailwindcss/typography": "^0.5.15",
+    "@types/d3-timer": "^3.0.2",
     "daisyui": "^4.12.14",
     "typed-emitter": "^2.1.0"
   }
