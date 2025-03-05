@@ -20,7 +20,7 @@ function onToggleClick() {
       <template v-if="sharedState.state.value?.state == 'playing'">
         <span>Stop</span>
         <icon name="mdi:stop" size="25" />
-        <span class="loading loading-spinner loading-lg" />
+        <span class="loading loading-spinner loading-lg max-w-8" />
       </template>
       <template v-else>
         <span>Start</span>
@@ -29,6 +29,6 @@ function onToggleClick() {
     </button>
   </template>
   <template v-else>
-    <span class="loading loading-spinner loading-lg max-w-6" />
+    <span class="loading loading-spinner loading-lg max-w-8" />
   </template>
 </template>

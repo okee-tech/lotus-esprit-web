@@ -29,12 +29,12 @@ function onMouseUp() {
         Trigger
         <span
           v-if="sharedState.state.value.state == 'playing'"
-          class="loading loading-spinner loading-lg"
+          class="loading loading-spinner loading-lg max-w-8"
         />
       </button>
     </div>
   </template>
   <template v-else>
-    <span class="loading loading-spinner loading-lg" />
+    <span class="loading loading-spinner loading-lg max-w-8" />
   </template>
 </template>

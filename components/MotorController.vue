@@ -23,6 +23,6 @@ function onToggleClick() {
     </button>
   </template>
   <template v-else>
-    <span class="loading loading-spinner loading-lg" />
+    <span class="loading loading-spinner loading-lg max-w-8" />
   </template>
 </template>
