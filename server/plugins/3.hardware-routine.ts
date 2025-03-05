@@ -136,9 +136,9 @@ async function wingAnimation(state: SharedState<AnimationState>) {
   }
 
   if (state.state?.state == "stop") {
-    leftPin.state = { ...leftPin.state!, angle: leftConf!.initialAngle };
+    leftPin.state = { angle: leftConf!.initialAngle, isEnabled: true };
     onServoUpdate(leftPin);
-    rightPin.state = { ...rightPin.state!, angle: rightConf!.initialAngle };
+    rightPin.state = { angle: rightConf!.initialAngle, isEnabled: true };
     onServoUpdate(rightPin);
     animationStarts.delete(state.stateId);
     return;
@@ -147,11 +147,11 @@ async function wingAnimation(state: SharedState<AnimationState>) {
   const progress = animationDuration / WING_ANIMATION_DURATION;
   const offset = Math.sin(progress * (Math.PI * 2) * WING_REPEATS) * 45;
 
-  leftPin.state = { ...leftPin.state!, angle: leftConf!.initialAngle + offset };
+  leftPin.state = { angle: leftConf!.initialAngle + offset, isEnabled: true };
   onServoUpdate(leftPin);
   rightPin.state = {
-    ...rightPin.state!,
     angle: rightConf!.initialAngle - offset,
+    isEnabled: true,
   };
   onServoUpdate(rightPin);
 
@@ -189,10 +189,45 @@ async function blinkAnimation(state: SharedState<AnimationState>) {
   setTimeout(() => blinkAnimation(state), BLINK_INTERVAL);
 }
 
-async function onAnimationUpdate(state: SharedState<AnimationState>) {
-  console.log(`Setting animation to ${state.state?.state}`);
+async function triggerAnimations(state: SharedState<AnimationState>) {
+  const triggerConf = hardwareConfig.servos.find((el) =>
+    state.stateId == "animation-gun-front"
+      ? el.name == "Front Gun"
+      : el.name == "Rear Gun"
+  );
+  const triggerPin = SharedState.get<ServoSharedState>(
+    `servo/${triggerConf!.pin}`
+  );
+  if (!triggerPin) {
+    console.error("Servo not found");
+    state.state = { state: "stop" };
+    return;
+  }
 
-  if (state.state?.state == "start")
+  if (state.state?.state == "start") {
+    state.state = { state: "playing" };
+    triggerPin.state = {
+      angle: triggerConf!.softwareRange.max,
+      isEnabled: true,
+    };
+    onServoUpdate(triggerPin);
+  }
+
+  if (state.state?.state == "stop") {
+    triggerPin.state = {
+      angle: triggerConf!.softwareRange.min,
+      isEnabled: true,
+    };
+    onServoUpdate(triggerPin);
+  }
+}
+
+async function onAnimationUpdate(state: SharedState<AnimationState>) {
+  console.log(
+    `Setting animation to ${state.state?.state} for ${state.stateId}`
+  );
+
+  if (state.state?.state == "start") {
     if (
       state.stateId == "animation-wing-front" ||
       state.stateId == "animation-wing-rear"
@@ -203,8 +238,13 @@ async function onAnimationUpdate(state: SharedState<AnimationState>) {
       }, WING_ANIMATION_DURATION);
     }
 
-  if (state.state?.state == "start" && state.stateId == "animation-blinks")
-    blinkAnimation(state);
+    if (state.stateId == "animation-blinkss") blinkAnimation(state);
+    if (
+      state.stateId == "animation-gun-front" ||
+      state.stateId == "animation-gun-rear"
+    )
+      triggerAnimations(state);
+  }
 }
 
 async function hardwareRoutine() {
@@ -275,6 +315,24 @@ async function hardwareRoutine() {
   );
   blinkAnimationState.on("update", () =>
     onAnimationUpdate(blinkAnimationState)
+  );
+
+  const gunAnimationState = SharedState.get<AnimationState>(
+    "animation-gun-front",
+    {
+      state: "stop",
+    }
+  );
+  gunAnimationState.on("update", () => onAnimationUpdate(gunAnimationState));
+
+  const gunAnimationRearState = SharedState.get<AnimationState>(
+    "animation-gun-rear",
+    {
+      state: "stop",
+    }
+  );
+  gunAnimationRearState.on("update", () =>
+    onAnimationUpdate(gunAnimationRearState)
   );
 }
 

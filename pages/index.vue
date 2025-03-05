@@ -30,17 +30,14 @@ import ToggleMotorController from "~/components/ToggleMotorController.vue";
       </div>
       <div class="p-4 shadow-lg flex flex-row items-center gap-4 w-full">
         <span class="text-xl"> Front Gun </span>
-        <animation-toggle
-          animation-name="animation-blinks"
+        <servo-trigger
+          shared-name="animation-gun-front"
           class="w-full flex-1"
         />
       </div>
       <div class="p-4 shadow-lg flex flex-row items-center gap-4 w-full">
         <span class="text-xl"> Rear Gun </span>
-        <animation-toggle
-          animation-name="animation-blinks"
-          class="w-full flex-1"
-        />
+        <servo-trigger shared-name="animation-gun-rear" class="w-full flex-1" />
       </div>
 
       <div

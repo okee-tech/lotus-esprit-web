@@ -11,7 +11,6 @@ const sharedState = useSocketState<ToggleMotorSharedState>(
 );
 
 function onToggleDown(direction: "forward" | "backward") {
-  console.log(config, direction);
   sharedState.state.value!.state = direction;
 }
 
