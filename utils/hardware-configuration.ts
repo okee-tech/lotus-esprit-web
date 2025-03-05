@@ -61,6 +61,10 @@ const SMALL_SERVO: ServoConfig = {
   initialAngle: 135,
 };
 
+type AnimationState = {
+  state: "start" | "playing" | "stop";
+};
+
 const hardwareConfig: {
   servos: ServoConfig[];
   motors: MotorConfig[];
@@ -94,9 +98,9 @@ const hardwareConfig: {
     {
       ...BIG_SERVO,
       pin: 27,
-      name: "Font Gun Open",
-      softwareRange: { min: 70, max: 150 },
-      initialAngle: 135,
+      name: "Front Gun Open",
+      softwareRange: { min: 70, max: 155 },
+      initialAngle: 70,
     },
 
     {
@@ -132,4 +136,4 @@ const hardwareConfig: {
 };
 
 export default hardwareConfig;
-export type { ServoConfig, MotorConfig, ToggleMotor };
+export type { ServoConfig, MotorConfig, ToggleMotor, AnimationState };

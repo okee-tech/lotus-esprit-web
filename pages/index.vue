@@ -5,7 +5,13 @@ import ToggleMotorController from "~/components/ToggleMotorController.vue";
 
 <template>
   <div class="flex flex-col">
-    <separator class="h-px w-[90%] my-8" />
+    <span>Animations</span>
+    <div class="flex flex-row gap-4 flex-wrap">
+      <animation-toggle animation-name="animation-wing-front" />
+      <animation-toggle animation-name="animation-wing-rear" />
+    </div>
+
+    <separator class="h-px my-8 bg-base-200" />
 
     <span class="text-2xl">Manual Configuration</span>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">

@@ -1,4 +1,7 @@
-import hardwareConfig from "#utils/hardware-configuration";
+import hardwareConfig, {
+  type AnimationState,
+} from "#utils/hardware-configuration";
+import { DateTime } from "luxon";
 import { SharedState } from "./2.socket-shared-state";
 import { Gpio, Mode } from "@okee-tech/rppal";
 
@@ -91,6 +94,90 @@ function onToggleMotorUpdate(state: SharedState<ToggleMotorSharedState>) {
   }
 }
 
+const WING_REPEATS = 3;
+const WING_ANIMATION_DURATION = 8000;
+const animationStarts: Map<string, DateTime> = new Map();
+async function wingAnimation(state: SharedState<AnimationState>) {
+  if (state.state?.state == "start") {
+    animationStarts.set(state.stateId, DateTime.now());
+    state.state!.state = "playing";
+  }
+
+  const startState = animationStarts.get(state.stateId);
+  if (!startState) return console.error("Animation start not found");
+  const animationDuration = -startState.diffNow("milliseconds");
+  if (animationDuration > WING_ANIMATION_DURATION) state.state!.state = "stop";
+
+  const rightConf = hardwareConfig.servos.find((el) =>
+    state.stateId == "animation-wing-front"
+      ? el.name == "Front Left Wing"
+      : el.name == "Read Left Wing"
+  );
+  const ringPin = servoPins.find(({ pin }) => rightConf?.pin == pin);
+  if (!ringPin) {
+    console.error("Servo not found");
+    state.state!.state = "stop";
+    return;
+  }
+
+  const leftConf = hardwareConfig.servos.find((el) =>
+    state.stateId == "animation-wing-front"
+      ? el.name == "Front Right Wing"
+      : el.name == "Read Right Wing"
+  );
+  const leftPin = servoPins.find(({ pin }) => leftConf?.pin == pin);
+  if (!leftPin) {
+    console.error("Servo not found");
+    state.state!.state = "stop";
+    return;
+  }
+
+  if (state.state?.state == "stop") {
+    leftPin.value = leftConf!.initialAngle;
+    ringPin.value = rightConf!.initialAngle;
+    animationStarts.delete(state.stateId);
+    return;
+  }
+
+  const progress = animationDuration / WING_ANIMATION_DURATION;
+  const angle =
+    Math.sin(progress * (Math.PI * 2) * WING_REPEATS) * 90 +
+    leftConf!.initialAngle;
+
+  leftPin.value = leftConf!.initialAngle + angle;
+  ringPin.value = rightConf!.initialAngle - angle;
+
+  console.log(`Setting wing to ${angle}°`);
+
+  setTimeout(() => wingAnimation(state), 10);
+}
+async function blinkAnimation(state: SharedState<AnimationState>) {
+  if (state.state?.state == "stop") {
+    animationStarts.set(state.stateId, DateTime.now());
+    return;
+  }
+
+  setTimeout(() => blinkAnimation(state), 10);
+}
+
+async function onAnimationUpdate(state: SharedState<AnimationState>) {
+  console.log(`Setting animation to ${state.state?.state}`);
+
+  if (state.state?.state == "start")
+    if (
+      state.stateId == "animation-wing-front" ||
+      state.stateId == "animation-wing-rear"
+    )
+      wingAnimation(state).then(() => {
+        // state.state = { state: "stopped" };
+      });
+
+  if (state.state?.state == "start")
+    blinkAnimation(state).then(() => {
+      // state.state = { state: "stopped" };
+    });
+}
+
 async function hardwareRoutine() {
   const sharedServos = hardwareConfig.servos.map((motor) => {
     const state = SharedState.get<ServoSharedState>(`servo/${motor.pin}`, {
@@ -131,6 +218,34 @@ async function hardwareRoutine() {
   );
   sharedToggleMotors.forEach((state) =>
     state.on("update", () => onToggleMotorUpdate(state))
+  );
+
+  const windAnimationState = SharedState.get<AnimationState>(
+    "animation-wing-front",
+    {
+      state: "stop",
+    }
+  );
+  windAnimationState.on("update", () => onAnimationUpdate(windAnimationState));
+
+  const wingAnimationRearState = SharedState.get<AnimationState>(
+    "animation-wing-rear",
+    {
+      state: "stop",
+    }
+  );
+  wingAnimationRearState.on("update", () =>
+    onAnimationUpdate(wingAnimationRearState)
+  );
+
+  const blinkAnimationState = SharedState.get<AnimationState>(
+    "blink-animation",
+    {
+      state: "stop",
+    }
+  );
+  blinkAnimationState.on("update", () =>
+    onAnimationUpdate(blinkAnimationState)
   );
 }
 
