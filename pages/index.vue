@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import hardwareConfig from "#utils/hardware-configuration";
+import ToggleMotorController from "~/components/ToggleMotorController.vue";
 </script>
 
 <template>
@@ -21,6 +22,15 @@ import hardwareConfig from "#utils/hardware-configuration";
         <div class="flex flex-col mb-2">
           <div class="text-xl font-bold">Motor: {{ motor.name }}</div>
           <MotorController :config="motor" />
+        </div>
+      </template>
+    </div>
+
+    <div class="grid grid-cols-2 text-center place-items-center">
+      <template v-for="(motor, i) in hardwareConfig.toggleMotors" :key="i">
+        <div class="flex flex-col mb-2">
+          <div class="text-xl font-bold">Motor Toggle: {{ motor.name }}</div>
+          <ToggleMotorController :config="motor" />
         </div>
       </template>
     </div>

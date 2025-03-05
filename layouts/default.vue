@@ -6,7 +6,7 @@
     <header class="w-full bg-base-100 shadow-lg">
       <nav class="navbar container mx-auto px-4">
         <div class="flex-1">
-          <div>DeLorean</div>
+          <div>Lotus Esprit</div>
         </div>
       </nav>
     </header>

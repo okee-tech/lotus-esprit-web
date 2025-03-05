@@ -20,6 +20,8 @@ type MotorConfig = {
 type ToggleMotor = {
   in1: number;
   in2: number;
+
+  name: string;
 };
 
 const BIG_SERVO: ServoConfig = {
@@ -38,7 +40,7 @@ const BIG_SERVO: ServoConfig = {
     min: 0,
     max: 270,
   },
-  initialAngle: 0,
+  initialAngle: 135,
 };
 const SMALL_SERVO: ServoConfig = {
   pin: -1,
@@ -56,7 +58,7 @@ const SMALL_SERVO: ServoConfig = {
     min: 0,
     max: 270,
   },
-  initialAngle: 0,
+  initialAngle: 135,
 };
 
 const hardwareConfig: {
@@ -65,16 +67,52 @@ const hardwareConfig: {
   toggleMotors: ToggleMotor[];
 } = {
   servos: [
-    { ...BIG_SERVO, pin: 2, name: "Big Rear Left" },
-    { ...BIG_SERVO, pin: 3, name: "Big Rear Right" },
-    { ...BIG_SERVO, pin: 4, name: "Big Front Left" },
-    { ...BIG_SERVO, pin: 17, name: "Big Front Right" },
-    { ...BIG_SERVO, pin: 27, name: "Big Font Gun Open" },
+    {
+      ...BIG_SERVO,
+      pin: 2,
+      name: "Rear Left Wing",
+      softwareRange: { min: 90, max: 180 },
+    },
+    {
+      ...BIG_SERVO,
+      pin: 3,
+      name: "Rear Right Wing",
+      softwareRange: { min: 90, max: 180 },
+    },
+    {
+      ...BIG_SERVO,
+      pin: 4,
+      name: "Front Left Wing",
+      softwareRange: { min: 90, max: 180 },
+    },
+    {
+      ...BIG_SERVO,
+      pin: 17,
+      name: "Front Right Wing",
+      softwareRange: { min: 90, max: 180 },
+    },
+    {
+      ...BIG_SERVO,
+      pin: 27,
+      name: "Font Gun Open",
+      softwareRange: { min: 70, max: 130 },
+      initialAngle: 150,
+    },
 
-    { ...SMALL_SERVO, pin: 22, name: "Small ..." },
-    { ...SMALL_SERVO, pin: 10, name: "Small ..." },
-    { ...SMALL_SERVO, pin: 9, name: "Small ..." },
-    { ...SMALL_SERVO, pin: 11, name: "Small ..." },
+    {
+      ...SMALL_SERVO,
+      pin: 22,
+      name: "Front Gun",
+      softwareRange: { min: 130, max: 190 },
+    },
+    { ...SMALL_SERVO, pin: 10, name: "Number Plate" },
+    {
+      ...SMALL_SERVO,
+      pin: 9,
+      name: "Rear Gun",
+      softwareRange: { min: 125, max: 180 },
+    },
+    { ...SMALL_SERVO, pin: 11, name: "Rear Plate" },
   ],
   motors: [
     { pin: 5, name: "Lamp" },
@@ -87,9 +125,11 @@ const hardwareConfig: {
     {
       in1: 21,
       in2: 20,
+
+      name: "Roof",
     },
   ],
 };
 
 export default hardwareConfig;
-export type { ServoConfig, MotorConfig };
+export type { ServoConfig, MotorConfig, ToggleMotor };

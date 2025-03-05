@@ -1,12 +1,14 @@
 import hardwareConfig from "#utils/hardware-configuration";
 import { SharedState } from "./2.socket-shared-state";
 import { Gpio, Mode } from "@okee-tech/rppal";
-import { Tween } from "@tweenjs/tween.js";
-import { timer } from "d3-timer";
 
 const gpio = new Gpio();
 const servoPins = hardwareConfig.servos.map((servo) => gpio.get(servo.pin));
 const motorPins = hardwareConfig.motors.map((motor) => gpio.get(motor.pin));
+const toggleMotorsPins = hardwareConfig.toggleMotors.map((motor) => ({
+  in1: gpio.get(motor.in1),
+  in2: gpio.get(motor.in2),
+}));
 servoPins.forEach((servo) => {
   servo.mode = Mode.Output;
   servo.value = 0;
@@ -15,35 +17,12 @@ motorPins.forEach((motor) => {
   motor.mode = Mode.Output;
   motor.value = 0;
 });
-
-const INIT_TIME = 5000;
-const INIT_INERVAL = 50;
-const INIT_DUTY = 0.2;
-// async function initialPosition() {
-//   // const sharedServos = hardwareConfig.servos.map((motor) => {
-//   //   return timer()
-//   // });
-
-//   for (const servo of hardwareConfig.servos) {
-//     const servoInitTimer = timer(async (elapres) => {
-//       if (elapres > INIT_TIME) {
-//         servoInitTimer.stop();
-//         return;
-//       }
-
-//       const state = SharedState.get<ServoSharedState>(`servo/${servo.pin}`);
-//       state.state = {
-//         angle: servo.initialAngle,
-//         isEnabled: true,
-//       };
-
-//       await new Promise((resolve) => setTimeout(resolve, INIT_DUTY));
-//       // state.up÷
-//     }, INIT_DELAY);
-//   }
-
-//   sharedServos.forEach((state) => onServoUpdate(state));
-// }
+toggleMotorsPins.forEach((motor) => {
+  motor.in1.mode = Mode.Output;
+  motor.in2.mode = Mode.Output;
+  motor.in1.value = 0;
+  motor.in2.value = 0;
+});
 
 function onServoUpdate(localState: SharedState<ServoSharedState>) {
   const state = localState.state;
@@ -88,18 +67,60 @@ function onMotorUpdate(state: SharedState<MotorSharedState>) {
   motorPin.value = state.state.isEnabled ? 1 : 0;
 }
 
+function onToggleMotorUpdate(state: SharedState<ToggleMotorSharedState>) {
+  const motorPins = toggleMotorsPins.find(
+    (motor) =>
+      `toggle-motor/${motor.in1.pin}-${motor.in2.pin}` === state.stateId
+  );
+  if (!motorPins) return console.error("Motor was not initialized");
+  console.log(`Setting motor ${state.stateId} to ${state.state?.state}`);
+
+  if (state.state?.state == "stop") {
+    motorPins.in1.value = 0;
+    motorPins.in2.value = 0;
+  } else if (state.state?.state == "forward") {
+    motorPins.in1.value = 1;
+    motorPins.in2.value = 0;
+  } else if (state.state?.state == "backward") {
+    motorPins.in1.value = 0;
+    motorPins.in2.value = 1;
+  } else {
+    console.error("Invalid motor state");
+    motorPins.in1.value = 0;
+    motorPins.in2.value = 0;
+  }
+}
+
 async function hardwareRoutine() {
   const sharedServos = hardwareConfig.servos.map((motor) => {
-    return SharedState.get<ServoSharedState>(`servo/${motor.pin}`, {
-      angle: 0,
-      isEnabled: false,
+    const state = SharedState.get<ServoSharedState>(`servo/${motor.pin}`, {
+      angle: motor.initialAngle,
+      isEnabled: true,
     });
+    onServoUpdate(state);
+
+    return state;
   });
 
   const sharedMotors = hardwareConfig.motors.map((servo) => {
-    return SharedState.get<MotorSharedState>(`motor/${servo.pin}`, {
+    const state = SharedState.get<MotorSharedState>(`motor/${servo.pin}`, {
       isEnabled: false,
     });
+
+    onMotorUpdate(state);
+    return state;
+  });
+
+  const sharedToggleMotors = hardwareConfig.toggleMotors.map((motor) => {
+    const state = SharedState.get<ToggleMotorSharedState>(
+      `toggle-motor/${motor.in1}-${motor.in2}`,
+      {
+        state: "stop",
+      }
+    );
+
+    onToggleMotorUpdate(state);
+    return state;
   });
 
   sharedServos.forEach((state) =>
@@ -107,6 +128,9 @@ async function hardwareRoutine() {
   );
   sharedMotors.forEach((state) =>
     state.on("update", () => onMotorUpdate(state))
+  );
+  sharedToggleMotors.forEach((state) =>
+    state.on("update", () => onToggleMotorUpdate(state))
   );
 }
 
