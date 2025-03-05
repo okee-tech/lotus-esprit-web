@@ -3,7 +3,7 @@ import hardwareConfig, {
 } from "#utils/hardware-configuration";
 import { DateTime } from "luxon";
 import { SharedState } from "./2.socket-shared-state";
-import { Gpio, Mode } from "@okee-tech/rppal";
+import { Gpio, Mode, Pin } from "@okee-tech/rppal";
 
 const gpio = new Gpio();
 const servoPins = hardwareConfig.servos.map((servo) => gpio.get(servo.pin));
@@ -95,7 +95,7 @@ function onToggleMotorUpdate(state: SharedState<ToggleMotorSharedState>) {
 }
 
 const WING_REPEATS = 3;
-const WING_ANIMATION_DURATION = 8000;
+const WING_ANIMATION_DURATION = 15000;
 const animationStarts: Map<string, DateTime> = new Map();
 async function wingAnimation(state: SharedState<AnimationState>) {
   if (state.state?.state == "start") {
@@ -113,8 +113,8 @@ async function wingAnimation(state: SharedState<AnimationState>) {
       ? el.name == "Front Left Wing"
       : el.name == "Read Left Wing"
   );
-  const ringPin = servoPins.find(({ pin }) => rightConf?.pin == pin);
-  if (!ringPin) {
+  const rightPin = SharedState.get<ServoSharedState>(`servo/${rightConf!.pin}`);
+  if (!rightPin) {
     console.error("Servo not found");
     state.state!.state = "stop";
     return;
@@ -125,7 +125,7 @@ async function wingAnimation(state: SharedState<AnimationState>) {
       ? el.name == "Front Right Wing"
       : el.name == "Read Right Wing"
   );
-  const leftPin = servoPins.find(({ pin }) => leftConf?.pin == pin);
+  const leftPin = SharedState.get<ServoSharedState>(`servo/${leftConf!.pin}`);
   if (!leftPin) {
     console.error("Servo not found");
     state.state!.state = "stop";
@@ -133,21 +133,23 @@ async function wingAnimation(state: SharedState<AnimationState>) {
   }
 
   if (state.state?.state == "stop") {
-    leftPin.value = leftConf!.initialAngle;
-    ringPin.value = rightConf!.initialAngle;
+    leftPin.state = { ...leftPin.state!, angle: leftConf!.initialAngle };
+    onServoUpdate(leftPin);
+    rightPin.state = { ...rightPin.state!, angle: rightConf!.initialAngle };
+    onServoUpdate(rightPin);
     animationStarts.delete(state.stateId);
     return;
   }
 
   const progress = animationDuration / WING_ANIMATION_DURATION;
   const angle =
-    Math.sin(progress * (Math.PI * 2) * WING_REPEATS) * 90 +
+    Math.sin(progress * (Math.PI * 2) * WING_REPEATS) * 45 +
     leftConf!.initialAngle;
 
-  leftPin.value = leftConf!.initialAngle + angle;
-  ringPin.value = rightConf!.initialAngle - angle;
-
-  console.log(`Setting wing to ${angle}°`);
+  leftPin.state = { ...leftPin.state!, angle };
+  onServoUpdate(leftPin);
+  rightPin.state = { ...rightPin.state!, angle };
+  onServoUpdate(rightPin);
 
   setTimeout(() => wingAnimation(state), 10);
 }
