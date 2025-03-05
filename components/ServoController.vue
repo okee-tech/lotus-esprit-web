@@ -33,8 +33,8 @@ function onToggleClick() {
           class="range"
           :class="{ 'opacity-30': !sharedState.state.value.isEnabled }"
           type="range"
-          :min="config.angleRange.min"
-          :max="config.angleRange.max"
+          :min="config.softwareRange.min"
+          :max="config.softwareRange.max"
           :step="0.1"
         />
       </div>
