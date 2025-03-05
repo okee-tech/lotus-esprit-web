@@ -159,7 +159,7 @@ async function wingAnimation(state: SharedState<AnimationState>) {
 }
 
 const BLINK_INTERVAL = 1000;
-const BLINK_DURATION = 100;
+const BLINK_DURATION = 300;
 async function blinkAnimation(state: SharedState<AnimationState>) {
   if (state.state?.state == "start") state.state = { state: "playing" };
 
@@ -239,12 +239,13 @@ async function onAnimationUpdate(state: SharedState<AnimationState>) {
     }
 
     if (state.stateId == "animation-blinks") blinkAnimation(state);
-    if (
-      state.stateId == "animation-gun-front" ||
-      state.stateId == "animation-gun-rear"
-    )
-      triggerAnimations(state);
   }
+
+  if (
+    state.stateId == "animation-gun-front" ||
+    state.stateId == "animation-gun-rear"
+  )
+    triggerAnimations(state);
 }
 
 async function hardwareRoutine() {

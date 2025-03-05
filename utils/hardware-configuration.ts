@@ -108,6 +108,7 @@ const hardwareConfig: {
       pin: 22,
       name: "Front Gun",
       softwareRange: { min: 130, max: 190 },
+      initialAngle: 130,
     },
     { ...SMALL_SERVO, pin: 10, name: "Number Plate" },
     {
@@ -115,6 +116,7 @@ const hardwareConfig: {
       pin: 9,
       name: "Rear Gun",
       softwareRange: { min: 125, max: 180 },
+      initialAngle: 125,
     },
     { ...SMALL_SERVO, pin: 11, name: "Rear Plate" },
   ],
