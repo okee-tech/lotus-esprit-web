@@ -238,7 +238,7 @@ async function onAnimationUpdate(state: SharedState<AnimationState>) {
       }, WING_ANIMATION_DURATION);
     }
 
-    if (state.stateId == "animation-blinkss") blinkAnimation(state);
+    if (state.stateId == "animation-blinks") blinkAnimation(state);
     if (
       state.stateId == "animation-gun-front" ||
       state.stateId == "animation-gun-rear"
