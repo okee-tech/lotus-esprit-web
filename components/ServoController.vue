@@ -10,7 +10,7 @@ function onToggleClick() {
 </script>
 
 <template>
-  <div class="grid grid-cols-2 place-items-center p-2">
+  <div class="grid grid-cols-3 place-items-center p-2">
     <template v-if="sharedState.state.value">
       <button class="btn w-1/2" @click="onToggleClick">
         <template v-if="!sharedState.state.value?.isEnabled">
@@ -23,7 +23,7 @@ function onToggleClick() {
         </template>
       </button>
 
-      <div class="w-full flex flex-col">
+      <div class="col-span-2 w-full flex flex-col">
         <div>
           Angle: {{ Math.round(sharedState.state.value.angle * 10) / 10 }}°
         </div>

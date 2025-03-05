@@ -95,8 +95,8 @@ const hardwareConfig: {
       ...BIG_SERVO,
       pin: 27,
       name: "Font Gun Open",
-      softwareRange: { min: 70, max: 130 },
-      initialAngle: 150,
+      softwareRange: { min: 70, max: 150 },
+      initialAngle: 135,
     },
 
     {

@@ -18,3 +18,7 @@ type MotorSharedState = {
 
   error?: string;
 };
+
+type ToggleMotorSharedState = {
+  state: "forward" | "backward" | "stop";
+};
