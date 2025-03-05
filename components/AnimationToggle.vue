@@ -1,6 +1,9 @@
 <script lang="ts" setup>
 const { animationName } = defineProps<{
-  animationName: "animation-wing-front" | "animation-wing-rear";
+  animationName:
+    | "animation-wing-front"
+    | "animation-wing-rear"
+    | "animation-blinks";
 }>();
 
 const sharedState = useSocketState<AnimationState>(animationName);
@@ -13,7 +16,7 @@ function onToggleClick() {
 
 <template>
   <template v-if="sharedState.state.value">
-    <button class="btn max-w-40" @click="onToggleClick">
+    <button class="btn" @click="onToggleClick">
       <template v-if="sharedState.state.value?.state == 'playing'">
         <span>Stop</span>
         <icon name="mdi:stop" size="25" />
@@ -26,6 +29,6 @@ function onToggleClick() {
     </button>
   </template>
   <template v-else>
-    <span class="loading loading-spinner loading-lg" />
+    <span class="loading loading-spinner loading-lg max-w-6" />
   </template>
 </template>

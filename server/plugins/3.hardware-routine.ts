@@ -3,7 +3,7 @@ import hardwareConfig, {
 } from "#utils/hardware-configuration";
 import { DateTime } from "luxon";
 import { SharedState } from "./2.socket-shared-state";
-import { Gpio, Mode, Pin } from "@okee-tech/rppal";
+import { Gpio, Mode } from "@okee-tech/rppal";
 
 const gpio = new Gpio();
 const servoPins = hardwareConfig.servos.map((servo) => gpio.get(servo.pin));
@@ -157,13 +157,36 @@ async function wingAnimation(state: SharedState<AnimationState>) {
 
   setTimeout(() => wingAnimation(state), 20);
 }
+
+const BLINK_INTERVAL = 1000;
+const BLINK_DURATION = 100;
 async function blinkAnimation(state: SharedState<AnimationState>) {
-  if (state.state?.state == "stop") {
-    animationStarts.set(state.stateId, DateTime.now());
+  if (state.state?.state == "start") state.state = { state: "playing" };
+
+  const blinkConf = hardwareConfig.motors.find((el) => el.name == "Blinks");
+  const blinksPin = SharedState.get<MotorSharedState>(
+    `motor/${blinkConf?.pin}`
+  );
+  if (!blinksPin) {
+    console.error("Motor not found");
+    state.state = { state: "stop" };
     return;
   }
 
-  setTimeout(() => blinkAnimation(state), 10);
+  if (state.state?.state == "stop") {
+    blinksPin.state = { isEnabled: false };
+    onMotorUpdate(blinksPin);
+    return;
+  }
+
+  blinksPin.state = { isEnabled: true };
+  onMotorUpdate(blinksPin);
+  await new Promise((r) => setTimeout(r, BLINK_DURATION));
+
+  blinksPin.state = { isEnabled: false };
+  onMotorUpdate(blinksPin);
+
+  setTimeout(() => blinkAnimation(state), BLINK_INTERVAL);
 }
 
 async function onAnimationUpdate(state: SharedState<AnimationState>) {
@@ -180,10 +203,8 @@ async function onAnimationUpdate(state: SharedState<AnimationState>) {
       }, WING_ANIMATION_DURATION);
     }
 
-  if (state.state?.state == "start")
-    blinkAnimation(state).then(() => {
-      // state.state = { state: "stopped" };
-    });
+  if (state.state?.state == "start" && state.stateId == "animation-blinks")
+    blinkAnimation(state);
 }
 
 async function hardwareRoutine() {
@@ -247,7 +268,7 @@ async function hardwareRoutine() {
   );
 
   const blinkAnimationState = SharedState.get<AnimationState>(
-    "blink-animation",
+    "animation-blinks",
     {
       state: "stop",
     }

@@ -119,11 +119,11 @@ const hardwareConfig: {
     { ...SMALL_SERVO, pin: 11, name: "Rear Plate" },
   ],
   motors: [
-    { pin: 5, name: "Lamp" },
-    { pin: 6, name: "RR" },
-    { pin: 13, name: "RL" },
-    { pin: 19, name: "LR" },
-    { pin: 26, name: "LL" },
+    { pin: 5, name: "Blinks" },
+    { pin: 6, name: "Motor 1" },
+    { pin: 13, name: "Motor 2" },
+    { pin: 19, name: "Motor 3" },
+    { pin: 26, name: "Motor 3" },
   ],
   toggleMotors: [
     {

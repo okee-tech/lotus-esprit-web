@@ -22,9 +22,9 @@ function onMouseUp() {
 
 <template>
   <template v-if="sharedState.state.value">
-    <div class="flex flex-row btn-group">
+    <div class="flex flex-row btn-group w-full">
       <button
-        class="btn max-w-40"
+        class="btn flex-1"
         @mousedown="onToggleDown('forward')"
         @mouseup="onMouseUp"
         @mouseleave="onMouseUp"
@@ -35,7 +35,7 @@ function onMouseUp() {
         Forward
       </button>
       <button
-        class="btn max-w-40"
+        class="btn flex-1"
         @mousedown="onToggleDown('backward')"
         @mouseup="onMouseUp"
         @mouseleave="onMouseUp"
